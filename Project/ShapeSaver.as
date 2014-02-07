@@ -118,26 +118,35 @@
 				var tempShape:MyShape = new MyShape(MyShapeType.ReturnType(xmlData.myShape[i].shapeType));
 				tempShape.x = xmlData.myShape[i].xPosition;
 				tempShape.y = xmlData.myShape[i].yPosition;
-				var w: Number = xmlData.myShape[i].width;
-				var h: Number = xmlData.myShape[i].height;	
+				
+				tempShape.BeginColor(xmlData.myShape[i].color);
+				
+				if(tempShape.shapeType != MyShapeType.LINE){
+					var w: Number = xmlData.myShape[i].width;
+					var h: Number = xmlData.myShape[i].height;
+					
+					tempShape.DrawShape(w, h);
+					
+					if(tempShape.shapeType == MyShapeType.TEXTBOX){
+						tempShape.textBox.text = xmlData.myShape[i].textBox.@content;
+						tempShape.textFormat.size = xmlData.myShape[i].textBox.@fontSize;
+					}
+				}else{
+					var endX: Number = xmlData.myShape[i].endX;
+					var endY: Number = xmlData.myShape[i].endY;
+					
+					tempShape.DrawLine(endX, endY);
+				}
 				
 //				if(shape.shapeType == MyShapeType.TEXTBOX){
 //					s += "<textBox content=\"" + shape.textBox.text + "\"" +
 //						" fontSize=\"" + shape.textFormat.size + "\">'";
 //				}
 				
-				tempShape.BeginColor(xmlData.myShape[i].color);
-				tempShape.DrawShape(w, h);
-				
-				if(tempShape.shapeType == MyShapeType.TEXTBOX){
-					tempShape.textBox.text = xmlData.myShape[i].textBox.@content;
-					tempShape.textFormat.size = xmlData.myShape[i].textBox.@fontSize;
-				}
 				
 				loadedShapes.push(tempShape);
 			}
-			trace(xmlData);
-			trace(xmlData.myShape.length());
+			
 			shapesLoaded(loadedShapes);
 		}
 		
@@ -150,17 +159,20 @@
 				s += "<myShape index=\"" + index + "\">";
 				s += "<shapeType>" + shape.shapeType.Value + "</shapeType>";
 				s += "<color>" + shape.color + "</color>";
-				s += "<height>" + shape.height + "</height>";
-				s += "<width>" + shape.width + "</width>";
 				s += "<xPosition>" + shape.x + "</xPosition>";
 				s += "<yPosition>" + shape.y + "</yPosition>";
+				
+				if(shape.shapeType != MyShapeType.LINE){
+					s += "<height>" + shape.height + "</height>";
+					s += "<width>" + shape.width + "</width>";
+				}else{
+					s += "<endX>" + shape.endX + "</endX>";
+					s += "<endY>" + shape.endY + "</endY>";
+				}
 				
 				if(shape.shapeType == MyShapeType.TEXTBOX){
 					s += "<textBox content=\"" + shape.textBox.text + "\"" +
 						" fontSize=\"" + shape.textFormat.size + "\"></textBox>";
-				}
-				if(shape.shapeType == MyShapeType.LINE){
-					
 				}
 				
 				s += "</myShape>";
