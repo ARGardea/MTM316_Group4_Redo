@@ -2,13 +2,13 @@
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
 	import flash.globalization.LastOperationStatus;
 	import flash.text.engine.TextBaseline;
 	
 	import fl.motion.MotionEvent;
-	import flash.text.engine.TextBaseline;
 
 	public class Stage extends MovieClip {
 		var MasterMC: MovieClip;
@@ -30,9 +30,13 @@
 		var myShapes: Array = [];
 		var textBoxes: Array = [];
 		
+		var randomColor: uint;
+		var random: Boolean;
+		
 		public function Stage() {
 			MasterMC = new Master_MC();
 			ChangeColor = new ColorTransform();
+			random = true;
 			MasterMC.x = 0;
 			MasterMC.y = 0;
 			
@@ -50,9 +54,11 @@
 			MasterMC.FileWindow.FileLoadButton.addEventListener(MouseEvent.MOUSE_DOWN, saver.LoadButtonHandler);
 			MasterMC.FileWindow.FileSaveButton.addEventListener(MouseEvent.MOUSE_DOWN, saver.SaveButtonHandler);
 			MasterMC.FileButton.addEventListener(MouseEvent.CLICK, FileWindowClicked);
+			
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, DeleteHandler);
+			
 			MasterMC.DrawingStage.addEventListener(MouseEvent.MOUSE_MOVE, MouseOverStage);
 			MasterMC.DrawingStage.addEventListener(MouseEvent.MOUSE_OUT, MouseOutOfStage);
-			MasterMC.addEventListener(MouseEvent.CLICK, testTargets);
 			MasterMC.gotoAndStop(1);
 
 			addChild(MasterMC);
@@ -88,11 +94,29 @@
 			}
 		}
 		
-		function testTargets(e:MouseEvent){
-			trace("Target: " + e.target);
-			trace("CurrentTarget: " + e.currentTarget);
-			if(e.target == MasterMC.DrawingStage){
-				trace("Drawn On Stage");
+		function RemoveShapeFromArray(target: MyShape, targetArray: Array){
+			var index:Number = targetArray.indexOf(target);
+			if(index >= 0){
+				targetArray.splice(index, 1);
+			}
+		}
+		
+		function DeleteShape(target: MyShape){
+			if(target.shapeType == MyShapeType.TEXTBOX){
+				RemoveShapeFromArray(target, textBoxes);
+			}
+			RemoveShapeFromArray(target, myShapes);
+			shapeMover.ClearSelection();
+			target.graphics.clear();
+			target = null;
+		}
+		
+		function DeleteHandler(e: KeyboardEvent){
+			var deleteCode:int = 46;
+			if(shapeMover.selector != null){
+				if(e.keyCode == deleteCode && shapeMover.selector.target != null){
+					DeleteShape(shapeMover.selector.target);
+				}
 			}
 		}
 		
@@ -212,6 +236,46 @@
 			}
 		}
 		
+		function RandomInt(): int {
+			return (Math.random() * 100);
+		}
+		
+		function RandomColor(): uint {
+			randomColor = new uint();
+			
+			var values: Array = new Array(6);
+			
+			for (var index:int = 0; index < values.length; index++) {
+				var num: String = new String();
+				
+				var ranNum:uint = uint(Math.random() * 15);
+					
+				num = "" + ranNum;
+
+				if (num == "10")
+					num = "A";
+				else if (num == "11")
+					num = "B";
+				else if (num == "12")
+					num = "C";
+				else if (num == "13")
+					num = "D";
+				else if (num == "14")
+					num = "E";
+				else if (num == "15")
+					num = "F";
+				
+				values[index] = num
+			}
+			
+			var color: String = new String();
+			color = ("0x") + (values[0]) + (values[1]) + (values[2]) + (values[3]) + (values[4]) + (values[5]);
+			randomColor = uint(color); 
+			
+			
+			return randomColor;
+		}
+		
 	/*	function RandomColor(): Number {
 			
 		}*/
@@ -268,9 +332,33 @@
 			Buttons[1] = MasterMC.EditButton;
 			Buttons[2] = MasterMC.ImageButton;
 			Buttons[3] = MasterMC.ViewButton;
+			Buttons[4] = MasterMC.ModeStaticButton;
+			MasterMC.ModeStaticButton.addEventListener(MouseEvent.CLICK, ModeButtonClicked);
 
+			Buttons[5] = MasterMC.ModeRandomButton;
+			MasterMC.ModeRandomButton.addEventListener(MouseEvent.CLICK, ModeButtonClicked);
+			
 			SetupButtonText();
 		}
+		
+		function ModeButtonClicked(e: MouseEvent) {
+			
+			trace("lel- " + e.target.name);
+			if (e.target.name == "ModeStaticButton"){
+					ChangeColor.color = 0x335D33;
+				random = false;
+				e.currentTarget.transform.colorTransform = ChangeColor;
+				ChangeColor.color = 0x000000;
+				MasterMC.ModeRandomButton.transform.colorTransform = ChangeColor;
+			}
+			else if (e.target.name == "ModeRandomButton") {
+					ChangeColor.color = 0x335D33;
+				random = true;
+				e.currentTarget.transform.colorTransform = ChangeColor;
+				ChangeColor.color = 0x000000;
+				MasterMC.ModeStaticButton.transform.colorTransform = ChangeColor;
+			}
+		} 
 		
 		function SetupButtonText() {
 			ButtonTexts = new Array(4);
@@ -279,6 +367,11 @@
 			ButtonTexts[1] = MasterMC.EditButtonText;
 			ButtonTexts[2] = MasterMC.ImageButtonText;
 			ButtonTexts[3] = MasterMC.ViewButtonText;
+			
+			ButtonTexts[4] = MasterMC.ModeStaticText;
+			//MasterMC.ModeStaticText.text.addEventListener(MouseEvent.CLICK, ModeTextClicked);
+			ButtonTexts[5] = MasterMC.ModeRandomText;
+			//MasterMC.ModeRandomText.text.addEventListener(MouseEvent.CLICK, ModeTextClicked);
 		}
 		
 		function SetupPreviewShape() {
@@ -332,6 +425,14 @@
 		}
 
 		function DrawBasicShapeOnClick(e: MouseEvent) {
+			
+			if (random) {
+				MasterMC.TextFieldBasicShapeFill.text = RandomColor();
+				MasterMC.TextFieldBasicShapeWidth.text = RandomInt();
+				MasterMC.TextFieldBasicShapeHeight.text = RandomInt();
+				MasterMC.TextFieldBasicShapeFill.text = "0x" + MasterMC.TextFieldBasicShapeFill.text;
+			}
+			
 			var newShape: MyShape = DrawBasicShape(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text, MasterMC.TextFieldBasicShapeFill.text);
 			MasterMC.DrawingStage.addChild(newShape);
 			myShapes.push(newShape);

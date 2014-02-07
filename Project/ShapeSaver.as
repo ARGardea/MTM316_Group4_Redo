@@ -29,7 +29,6 @@
 			theStageRef = theStage;
 			myShapesRef = shapesRef;
 			this.shapesLoaded = shapesLoaded;
-			this.Initialize();
 		}
 
 		private function DrawButton() {
@@ -48,16 +47,6 @@
 			button2.graphics.lineStyle(1, 0x000000);
 			button2.graphics.drawRect(0, 0, buttonWidth, buttonHeight);
 			theStageRef.addChild(button2);
-		}
-
-		private function Initialize() {
-			//DrawButton();
-			//button2.addEventListener(MouseEvent.MOUSE_DOWN, LoadButtonHandler);
-			//button.addEventListener(MouseEvent.MOUSE_DOWN, MouseDownHandler);
-
-			xmlData = <xmlData> 
-						<test> data </test>
-					  </xmlData>;
 		}
 
 		function SaveButtonHandler(e: MouseEvent) {
@@ -94,7 +83,6 @@
 
 			xmlData = new XML(fileLoader.data);
 			
-			trace(xmlData);
 			ProcessLoadedXML();
 		}
 
