@@ -101,6 +101,8 @@
 				MasterMC.gotoAndStop(2);
 			}else if(target.shapeType == MyShapeType.RECTANGLE){
 				MasterMC.gotoAndStop(3);
+			}else if(target.shapeType == MyShapeType.LINE){
+				MasterMC.gotoAndStop(4);
 			}else if(target.shapeType == MyShapeType.TEXTBOX){
 				MasterMC.gotoAndStop(5);
 			}
@@ -157,34 +159,33 @@
 		}
 
 		function DrawBasicShape(_x: int, _y: int, _width: int, _height: int, _fill: int) : MyShape {
-			BasicShape = new MyShape(MyShapeType.RECTANGLE);
+			//BasicShape = new MyShape(MyShapeType.RECTANGLE);
+			var newShape = new MyShape(MyShapeType.RECTANGLE);
 			
-			BasicShape.graphics.clear();
+			newShape.graphics.clear();
 			
-			BasicShape.x = _x;
-			BasicShape.y = _y;
+			newShape.x = _x;
+			newShape.y = _y;
 			
-			BasicShape.BeginColor(_fill);
+			newShape.BeginColor(_fill);
 			
 			if (MasterMC.currentFrame == 2){
-				BasicShape.shapeType = MyShapeType.ELLIPSE;
+				newShape.shapeType = MyShapeType.ELLIPSE;
 			}
 			else if (MasterMC.currentFrame == 3){
-				BasicShape.shapeType = MyShapeType.RECTANGLE;
+				newShape.shapeType = MyShapeType.RECTANGLE;
 			}
 			else if (MasterMC.currentFrame == 5){
-				BasicShape.shapeType = MyShapeType.TEXTBOX;
+				newShape.shapeType = MyShapeType.TEXTBOX;
 			}
 			
-			BasicShape.DrawShape(_width, _height);
-			BasicShape.graphics.endFill();
+			newShape.DrawShape(_width, _height);
+			newShape.graphics.endFill();
 			
-			return BasicShape;
+			return newShape;
 		}
 		
 		function DrawTextBox(_x: int, _y: int, _width: int, _height: int) : TextBoxes {
-			trace("I should be able to see this");
-			trace("X: " + _x + ", Y: " + _y + ", Width: " + _width + ", Height: " + _height);
 			return new TextBoxes(_x, _y, _width, _height);
 		}
 		
@@ -199,14 +200,43 @@
 		
 		function AddDrawingEvents() {
 			MasterMC.addEventListener(MouseEvent.MOUSE_MOVE, MoveMouseTracker);			
-			MasterMC.DrawingStage.addEventListener(MouseEvent.CLICK, DrawBasicShapeOnClick);
 			MasterMC.DrawingStage.addEventListener(MouseEvent.MOUSE_MOVE, UpdateXYTextField);
 			MasterMC.TextFieldBasicShapeFill.addEventListener(Event.CHANGE, UpdateShapePreview);
+			
+			if(MasterMC.currentFrame == 4)
+			{
+				MasterMC.DrawingStage.addEventListener(MouseEvent.MOUSE_DOWN, DrawStartOfLine);
+				MasterMC.DrawingStage.addEventListener(MouseEvent.MOUSE_UP, DrawEndOfLine);
+			}else{
+				MasterMC.DrawingStage.addEventListener(MouseEvent.CLICK, DrawBasicShapeOnClick);
+			}
 		}
 		
 	/*	function RandomColor(): Number {
 			
 		}*/
+		
+		function LineToolButtonPressed() {
+			MasterMC.gotoAndStop(4);
+			
+			MouseTracker = DrawBasicShape(15, 15, 7, 7, 0x000000);
+			//MasterMC.DrawingStage.addEventListener(MouseEvent.MOUSE_DOWN, shapeMover.ShapeClickHandler);
+			DrawBasicShapeOnStage();
+		}
+		
+		function DrawStartOfLine(e: MouseEvent)	{
+			BasicShape = new MyShape(MyShapeType.LINE);
+			BasicShape.x = MasterMC.MouseX.text;
+			BasicShape.y = MasterMC.MouseY.text;
+			//MasterMC.DrawingStage.addChild(BasicShape);
+		}
+		
+		function DrawEndOfLine(e: MouseEvent) {
+			BasicShape.RedrawLine(MasterMC.MouseX.text - BasicShape.x, MasterMC.MouseY.text - BasicShape.y);
+			//BasicShape.graphics.lineTo(MasterMC.MouseX.text, MasterMC.MouseY.text);
+			MasterMC.DrawingStage.addChild(BasicShape);
+			myShapes.push(BasicShape);
+		}
 		
 		function RectangleToolButtonPressed() {
 			MasterMC.gotoAndStop(3);
@@ -302,22 +332,30 @@
 		}
 
 		function DrawBasicShapeOnClick(e: MouseEvent) {
-			if(MasterMC.currentFrame == 5)
-			{
-				var textBox: MyShape = DrawBasicShape(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text, MasterMC.TextFieldBasicShapeFill.text);
-				//ourTextBox = DrawTextBox(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text);
-				MasterMC.DrawingStage.addChild(textBox);
-				myShapes.push(textBox);
-				textBoxes.push(textBox);
+			var newShape: MyShape = DrawBasicShape(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text, MasterMC.TextFieldBasicShapeFill.text);
+			MasterMC.DrawingStage.addChild(newShape);
+			myShapes.push(newShape);
+			
+			if(MasterMC.currentFrame == 5){
+				textBoxes.push(newShape);
 			}
-			else
-			{
-				var shape: MyShape = DrawBasicShape(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text, MasterMC.TextFieldBasicShapeFill.text);
-				MasterMC.DrawingStage.addChild(shape);
-				myShapes.push(shape);
+			
+			//if(MasterMC.currentFrame == 5)
+			//{
+			//	var textBox: MyShape = DrawBasicShape(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text, MasterMC.TextFieldBasicShapeFill.text);
+				//ourTextBox = DrawTextBox(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text);
+			//	MasterMC.DrawingStage.addChild(textBox);
+			//	myShapes.push(textBox);
+			//	textBoxes.push(textBox);
+			//}
+			//else
+			//{
+			//	var shape: MyShape = DrawBasicShape(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text, MasterMC.TextFieldBasicShapeFill.text);
+			//	MasterMC.DrawingStage.addChild(shape);
+			//	myShapes.push(shape);
 				//ourTextBox = DrawTextBox(MasterMC.MouseX.text, MasterMC.MouseY.text, MasterMC.TextFieldBasicShapeWidth.text, MasterMC.TextFieldBasicShapeHeight.text);
 				//MasterMC.DrawingStage.addChild(ourTextBox);
-			}
+			//}
 		}
 
 		function MouseOutOfStage(e: MouseEvent) {
@@ -344,6 +382,9 @@
 		function RemoveDrawingEvents() {
 			MasterMC.DrawingStage.removeEventListener(MouseEvent.MOUSE_MOVE, UpdateXYTextField);
 			MasterMC.removeEventListener(MouseEvent.MOUSE_MOVE, MoveMouseTracker);
+			
+			MasterMC.DrawingStage.removeEventListener(MouseEvent.MOUSE_DOWN, DrawStartOfLine);
+			MasterMC.DrawingStage.removeEventListener(MouseEvent.MOUSE_UP, DrawEndOfLine)
 
 			MasterMC.DrawingStage.removeEventListener(MouseEvent.CLICK, DrawBasicShapeOnClick);
 			if (MouseTracker != null && contains(MouseTracker))
@@ -360,27 +401,33 @@
 		function ToolButtonMouseDown(e: MouseEvent) {
 			ChangeColor.color = 0x993830;
 			e.currentTarget.transform.colorTransform = ChangeColor;
+			
+			if (e.currentTarget.name == "TextTool"){
+				SetTextBoxesSelectable(true);
+			}else{
+				SetTextBoxesSelectable(false);
+			}
 
 			if (e.currentTarget.name == "CircleTool") {
-				SetTextBoxesSelectable(false);
 				RemoveDrawingEvents();
 				CircleToolButtonPressed();
 			}
 			else if (e.currentTarget.name == "RectangleTool") {
-				SetTextBoxesSelectable(false);
 				RemoveDrawingEvents();
 				RectangleToolButtonPressed();
 				
 			}
 			else if (e.currentTarget.name == "SelectorTool") {
-				SetTextBoxesSelectable(false);
 				SelectorToolButtonPressed();
 				RemoveDrawingEvents();
 			}
 			else if (e.currentTarget.name == "TextTool") {
-				SetTextBoxesSelectable(true);
 				RemoveDrawingEvents();				
 				TextToolButtonPressed();
+			}
+			else if (e.currentTarget.name == "LineTool") {
+				RemoveDrawingEvents();
+				LineToolButtonPressed();
 			}
 		}
 		

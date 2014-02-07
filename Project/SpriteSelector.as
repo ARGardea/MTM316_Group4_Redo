@@ -28,9 +28,17 @@
 			this.height = target.height;
 			this.width = target.width;
 			
-			
 			this.x = target.x;
 			this.y = target.y;
+			
+			if(target.shapeType == MyShapeType.LINE){
+				if(target.endXDifferent){
+					this.x = target.x + target.endX;
+				}
+				if(target.endYDifferent){
+					this.y = target.y + target.endY;
+				}
+			}
 						
 			DrawSelection();
 		}
@@ -58,6 +66,15 @@
 			this.x = target.x;
 			this.y = target.y;
 			
+			if(target.shapeType == MyShapeType.LINE){
+				if(target.endXDifferent){
+					this.x = target.x + target.lineXDifference;
+				}
+				if(target.endYDifferent){
+					this.y = target.y + target.lineYDifference;
+				}
+			}
+			
 			this.width = target.width;
 			this.height = target.height;
 		}
@@ -81,12 +98,30 @@
 			this.x = target.x;
 			this.y = target.y;
 			
+			if(target.shapeType == MyShapeType.LINE){
+				if(target.endXDifferent){
+					this.x = target.x + target.endX;
+				}
+				if(target.endYDifferent){
+					this.y = target.y + target.endY;
+				}
+			}
+			
 			DrawSelection();
 		}
 		
 		public function TrackTarget(){
 			this.x = target.x;
 			this.y = target.y;
+			
+			if(target.shapeType == MyShapeType.LINE){
+				if(target.endXDifferent){
+					this.x = target.x + target.endX;
+				}
+				if(target.endYDifferent){
+					this.y = target.y + target.endY;
+				}
+			}
 		}
 		
 		public function ClearSelection(){

@@ -1,4 +1,4 @@
-package
+﻿package
 {
 	import flash.display.Sprite;
 	import flash.geom.ColorTransform;
@@ -13,6 +13,15 @@ package
 		public var color: uint;
 		public var xOffset: Number;
 		public var yOffset: Number;
+		
+		public var endX: Number;
+		public var endY: Number;
+		
+		public var endXDifferent: Boolean;
+		public var endYDifferent: Boolean;
+		
+		public var lineXDifference: Number;
+		public var lineYDifference: Number;
 		
 		public var textBox: TextField;
 		public var textFormat: TextFormat;
@@ -41,6 +50,24 @@ package
 			}
 		}
 		
+		public function RedrawLine(endX:Number, endY:Number){
+			graphics.clear();
+			DrawLine(endX, endY);
+		}
+		
+		public function DrawLine(endX:Number, endY:Number){
+			graphics.lineStyle(5, color, 1);
+			
+			this.endX = endX;
+			this.endY = endY;
+			
+			this.endXDifferent = (this.endX < 0);
+			this.endYDifferent = (this.endY < 0);
+			
+			graphics.lineTo(endX, endY);
+			
+		}
+		
 		public function DrawTextBox(w:Number, h:Number){
 			textBox = new TextField();
 			textFormat = new TextFormat();
@@ -63,10 +90,11 @@ package
 				this.graphics.drawRect(0, 0, w, h);
 			}else if(shapeType == MyShapeType.ELLIPSE){
 				this.graphics.drawEllipse(0, 0, w, h);
-				
 			}else if(shapeType == MyShapeType.TEXTBOX){
 				DrawTextBox(w, h);
 			}
+			
+			graphics.endFill();
 		}
 	}
 }

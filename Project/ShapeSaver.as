@@ -159,6 +159,9 @@
 					s += "<textBox content=\"" + shape.textBox.text + "\"" +
 						" fontSize=\"" + shape.textFormat.size + "\"></textBox>";
 				}
+				if(shape.shapeType == MyShapeType.LINE){
+					
+				}
 				
 				s += "</myShape>";
 				index++;
